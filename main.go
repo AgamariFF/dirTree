@@ -31,11 +31,13 @@ func dirTree(out io.Writer, path string, printFiles bool) error {
 			return filepath.SkipDir
 		}
 		if path != NameDir {
-			filesDir = append(filesDir, file{path, int(info.Size()), info.IsDir(), false})
-			if info.IsDir() {
+			if printFiles {
+				filesDir = append(filesDir, file{path, int(info.Size()), info.IsDir(), false})
+				dirs = append(dirs, info.Name())
+			} else if info.IsDir() {
+				filesDir = append(filesDir, file{path, int(info.Size()), info.IsDir(), false})
 				dirs = append(dirs, info.Name())
 			}
-
 		}
 		return nil
 
@@ -118,7 +120,7 @@ func main() {
 		panic("usage go run main.go . [-f]")
 	}
 	path := os.Args[1]
-	printFiles := len(os.Args) == 3 && os.Args[2] == "-f"
+	printFiles := len(os.Args) == 2 && os.Args[1] == "-f"
 	err := dirTree(out, path, printFiles)
 	if err != nil {
 		panic(err.Error())
